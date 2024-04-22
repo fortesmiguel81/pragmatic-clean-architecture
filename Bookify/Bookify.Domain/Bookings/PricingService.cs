@@ -5,12 +5,12 @@ namespace Bookify.Domain.Bookings;
 
 public class PricingService
 {
-    public PricingDetails CalculatePrice(Apartment apartment, DateRange duration)
+    public PricingDetails CalculatePrice(Apartment apartment, DateRange period)
     {
         var currency = apartment.Price.Currency;
 
         var priceForPeriod = new Money(
-            apartment.Price.Amount * duration.LengthInDays,
+            apartment.Price.Amount * period.LengthInDays,
             currency);
 
         decimal percentageUpCharge = 0;
@@ -32,7 +32,7 @@ public class PricingService
                 currency);
         }
 
-        var totalPrice = Money.Zero();
+        var totalPrice = Money.Zero(currency);
 
         totalPrice += priceForPeriod;
 
@@ -43,10 +43,6 @@ public class PricingService
 
         totalPrice += amenitiesUpCharge;
 
-        return new PricingDetails(
-            priceForPeriod,
-            apartment.CleaningFee,
-            amenitiesUpCharge,
-            totalPrice);
+        return new PricingDetails(priceForPeriod, apartment.CleaningFee, amenitiesUpCharge, totalPrice);
     }
 }
