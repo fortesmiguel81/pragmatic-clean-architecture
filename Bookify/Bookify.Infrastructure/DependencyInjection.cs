@@ -15,6 +15,7 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         services.AddTransient<IDateTimeProvider, DateTimeProvider>();
+
         services.AddTransient<IEmailService, EmailService>();
 
         var connectionString =
