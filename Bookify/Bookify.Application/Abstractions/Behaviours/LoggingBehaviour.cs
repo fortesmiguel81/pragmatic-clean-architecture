@@ -35,6 +35,7 @@ public class LoggingBehaviour<TRequest, TResponse>
         catch (Exception exception)
         {
             _logger.LogError(exception, "Command {Command} processing failed", name);
+
             throw;
         }
     }
