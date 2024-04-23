@@ -6,7 +6,7 @@ namespace Bookify.Infrastructure.Repositories;
 
 internal sealed class BookingRepository : Repository<Booking>, IBookingRepository
 {
-    private static readonly BookingStatus[] ActiveBookingStatuses = new[]
+    private static readonly BookingStatus[] ActiveBookingStatuses =
     {
         BookingStatus.Reserved,
         BookingStatus.Confirmed,
