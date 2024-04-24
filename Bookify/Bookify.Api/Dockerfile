@@ -3,16 +3,19 @@
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER app
 WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
+EXPOSE 5000
+EXPOSE 5001
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Bookify.Api/Bookify.Api.csproj", "Bookify.Api/"]
-RUN dotnet restore "./Bookify.Api/Bookify.Api.csproj"
+COPY ["src/Bookify.Api/Bookify.Api.csproj", "src/Bookify.Api/"]
+COPY ["src/Bookify.Application/Bookify.Application.csproj", "src/Bookify.Application/"]
+COPY ["src/Bookify.Domain/Bookify.Domain.csproj", "src/Bookify.Domain/"]
+COPY ["src/Bookify.Infrastructure/Bookify.Infrastructure.csproj", "src/Bookify.Infrastructure/"]
+RUN dotnet restore "./src/Bookify.Api/./Bookify.Api.csproj"
 COPY . .
-WORKDIR "/src/Bookify.Api"
+WORKDIR "/src/src/Bookify.Api"
 RUN dotnet build "./Bookify.Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
