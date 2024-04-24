@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Bookify.Api.Controllers.Users;
 
-[Route("api/user")]
+[Route("api/users")]
 [ApiController]
 public class UsersController : ControllerBase
 {
