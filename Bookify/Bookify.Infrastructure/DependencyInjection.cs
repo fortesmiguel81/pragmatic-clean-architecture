@@ -5,6 +5,7 @@ using Bookify.Application.Abstractions.Email;
 using Bookify.Domain.Abstractions;
 using Bookify.Domain.Apartments;
 using Bookify.Domain.Bookings;
+using Bookify.Domain.Reviews;
 using Bookify.Domain.Users;
 using Bookify.Infrastructure.Authentication;
 using Bookify.Infrastructure.Clock;
@@ -37,6 +38,33 @@ public static class DependencyInjection
         return services;
     }
 
+    private static void AddPersistence(IServiceCollection services, IConfiguration configuration)
+    {
+        var connectionString =
+            configuration.GetConnectionString("Database") ??
+            throw new ArgumentNullException(nameof(configuration));
+
+        services.AddDbContext<ApplicationDbContext>(options =>
+        {
+            options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention();
+        });
+
+        services.AddScoped<IUserRepository, UserRepository>();
+
+        services.AddScoped<IApartmentRepository, ApartmentRepository>();
+
+        services.AddScoped<IBookingRepository, BookingRepository>();
+
+        services.AddScoped<IReviewRepository, ReviewRepository>();
+
+        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ApplicationDbContext>());
+
+        services.AddSingleton<ISqlConnectionFactory>(_ =>
+            new SqlConnectionFactory(connectionString));
+
+        SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
+    }
+
     private static void AddAuthentication(IServiceCollection services, IConfiguration configuration)
     {
         services
@@ -65,30 +93,5 @@ public static class DependencyInjection
 
             httpClient.BaseAddress = new Uri(keycloakOptions.TokenUrl);
         });
-    }
-
-    private static void AddPersistence(IServiceCollection services, IConfiguration configuration)
-    {
-        var connectionString =
-            configuration.GetConnectionString("Database") ??
-            throw new ArgumentNullException(nameof(configuration));
-
-        services.AddDbContext<ApplicationDbContext>(options =>
-        {
-            options.UseNpgsql(connectionString).UseSnakeCaseNamingConvention();
-        });
-
-        services.AddScoped<IUserRepository, UserRepository>();
-
-        services.AddScoped<IApartmentRepository, ApartmentRepository>();
-
-        services.AddScoped<IBookingRepository, BookingRepository>();
-
-        services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<ApplicationDbContext>());
-
-        services.AddSingleton<ISqlConnectionFactory>(_ =>
-            new SqlConnectionFactory(connectionString));
-
-        SqlMapper.AddTypeHandler(new DateOnlyTypeHandler());
     }
 }
