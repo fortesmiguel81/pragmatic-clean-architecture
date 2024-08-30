@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Bookify.Api.Controllers.Users;
 
-[Route("api/users")]
 [ApiController]
+[Route("api/users")]
 public class UsersController : ControllerBase
 {
     private readonly ISender _sender;
@@ -20,6 +20,7 @@ public class UsersController : ControllerBase
 
     [HttpGet("me")]
     [Authorize(Roles = Roles.Registered)]
+    [Authorize(Policy = "users:read")]
     public async Task<IActionResult> GetLoggedInUser(CancellationToken cancellationToken)
     {
         var query = new GetLoggedInUserQuery();
