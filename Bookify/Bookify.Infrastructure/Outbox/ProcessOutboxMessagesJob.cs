@@ -5,6 +5,7 @@ using Bookify.Domain.Abstractions;
 using Dapper;
 using MediatR;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Quartz;
 
@@ -28,13 +29,13 @@ internal sealed class ProcessOutboxMessagesJob : IJob
         ISqlConnectionFactory sqlConnectionFactory,
         IPublisher publisher,
         IDateTimeProvider dateTimeProvider,
-        OutboxOptions outboxOptions,
+        IOptions<OutboxOptions> outboxOptions,
         ILogger<ProcessOutboxMessagesJob> logger)
     {
         _sqlConnectionFactory = sqlConnectionFactory;
         _publisher = publisher;
         _dateTimeProvider = dateTimeProvider;
-        _outboxOptions = outboxOptions;
+        _outboxOptions = outboxOptions.Value;
         _logger = logger;
     }
 
@@ -68,13 +69,18 @@ internal sealed class ProcessOutboxMessagesJob : IJob
 
                 exception = caughtException;
 
-                await UpdateOutboxMessageAsync(
-                    connection,
-                    transaction,
-                    outboxMessage,
-                    exception);
             }
+
+            await UpdateOutboxMessageAsync(
+                connection,
+                transaction,
+                outboxMessage,
+                exception);
         }
+
+        transaction.Commit();
+
+        _logger.LogInformation("Finished processing outbox messages");
     }
 
     private async Task<IReadOnlyList<OutboxMessageResponse>> GetOutboxMessagesAsync(
