@@ -46,7 +46,7 @@ if (app.Environment.IsDevelopment())
     app.ApplyMigrations();
 
     // REMARK: Uncomment the following line to seed the database with test data
-    //app.SeedData();
+    app.SeedData();
 }
 
 app.UseHttpsRedirection();
@@ -78,3 +78,5 @@ app.MapHealthChecks("health", new HealthCheckOptions
 });
 
 app.Run();
+
+public partial class Program;
